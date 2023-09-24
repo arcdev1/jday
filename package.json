@@ -29,7 +29,8 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.4",
-    "prisma": "5.1.1"
+    "prisma": "5.1.1",
+    "ts-node": "^10.9.1"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
