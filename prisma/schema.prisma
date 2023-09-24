@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid()) @db.Uuid
+  email       String        @unique
+  name        String        @unique
+  password    String
+  role        Role          @default(MORNING_REPORTER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  version     Int           @default(1)
+  DailyReport DailyReport[]
+}
+
+model DailyReport {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  user          User     @relation(fields: [userId], references: [id])
+  date          DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  morningRating Rating
+  dayRating     Rating
+}
+
+enum Rating {
+  BAD
+  GOOD
+  UNKNOWN
+}
+
+enum Role {
+  MORNING_REPORTER
+  DAY_REPORTER
+}

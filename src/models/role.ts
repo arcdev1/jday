@@ -1,0 +1,4 @@
+export enum Role {
+  DAY_REPORTER = "DAY_REPORTER",
+  MORNING_REPORTER = "MORNING_REPORTER",
+}
