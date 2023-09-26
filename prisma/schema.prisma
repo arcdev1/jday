@@ -27,11 +27,14 @@ model DailyReport {
   id            String   @id @default(uuid()) @db.Uuid
   userId        String   @db.Uuid
   user          User     @relation(fields: [userId], references: [id])
-  date          DateTime
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  morningRating Rating
-  dayRating     Rating
+  morningNotes  String?  @default("") @db.Text
+  dayNotes      String?  @default("") @db.Text
+  morningRating Rating?
+  dayRating     Rating?
+  rating        Rating
+  notes         String   @default("") @db.Text
 }
 
 enum Rating {
@@ -43,4 +46,6 @@ enum Rating {
 enum Role {
   MORNING_REPORTER
   DAY_REPORTER
+  GUARDIAN
+  EDUCATOR
 }

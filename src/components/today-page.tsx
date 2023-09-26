@@ -1,51 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
-  enterMorning,
-  enterSchoolDay,
   setBad,
   setGood,
+  setNotes,
   submit,
   useDayMachine,
   DayMachineState,
 } from "~/hooks/use-day-machine";
-import { useSession } from "~/hooks/use-session";
 import { Rating } from "~/models/rating";
 import RatingIcon from "./rating-icon";
 
 export default function TodayPage() {
   const { state, send } = useDayMachine();
-  const session = useSession();
-  const currentTime = new Date();
 
-  const isMorning = currentTime.getHours() < 12;
-
-  useEffect(() => {
-    if (isMorning) {
-      send(enterMorning());
-    } else {
-      send(enterSchoolDay());
-    }
-  }, [isMorning, send]);
-
-  const handleEmojiClick = (emoji: string) => {
-    if (emoji === "👍") {
+  const onRatingClick = (rating: Rating) => {
+    if (rating === Rating.GOOD) {
       send(setGood());
     } else {
       send(setBad());
     }
   };
 
-  const currentRating = state.matches(DayMachineState.MORNING)
-    ? state.context.morningRating
-    : state.context.dayRating;
+  const currentRating = state.context.rating;
+  const currentNotes = state.context.notes;
 
-  const currentNotes = state.matches(DayMachineState.MORNING)
-    ? state.context.morningNotes
-    : state.context.dayNotes;
-
-  console.log(currentRating);
   return (
     <form
       onSubmit={(e) => {
@@ -55,11 +34,7 @@ export default function TodayPage() {
     >
       <div className="flex flex-col items-center justify-center pt-12">
         <h2 className="text-4xl mb-8 text-black drop-shadow-md">
-          {isMorning
-            ? `How was Jacob's morning${
-                session != null ? `, ${session.name}` : ""
-              }?`
-            : `How was Jacob's day?`}
+          How is Jacob doing?
         </h2>
         <div className="flex space-x-8 mb-4">
           <button
@@ -69,7 +44,7 @@ export default function TodayPage() {
                 ? "bg-green-200 border border-green-500"
                 : "border border-transparent"
             }`}
-            onClick={() => handleEmojiClick("👍")}
+            onClick={() => onRatingClick(Rating.GOOD)}
           >
             <RatingIcon rating={Rating.GOOD} />
           </button>
@@ -80,7 +55,7 @@ export default function TodayPage() {
                 ? "bg-red-200 border border-red-500"
                 : "border border-transparent"
             }`}
-            onClick={() => handleEmojiClick("👎")}
+            onClick={() => onRatingClick(Rating.BAD)}
           >
             <RatingIcon rating={Rating.BAD} />
           </button>
@@ -98,9 +73,7 @@ export default function TodayPage() {
               className="w-full h-32 p-2 rounded text-black"
               placeholder="Tell me more..."
               value={currentNotes ?? ""}
-              onChange={(e) =>
-                send({ type: "SET_NOTES", notes: e.target.value })
-              }
+              onChange={(e) => send(setNotes(e.target.value))}
             ></textarea>
             <button
               type="submit"

@@ -1,10 +1,12 @@
 import { z } from "zod";
-import { Role } from "./role";
+import { roleSchema } from "./role";
+
 const sessionSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid(),
   name: z.string().nonempty().min(2).max(255),
   email: z.string().email(),
-  role: z.enum([Role.DAY_REPORTER, Role.MORNING_REPORTER]),
+  role: roleSchema,
   expiry: z.union([z.date(), z.string()]).transform((val) => {
     if (typeof val === "string") {
       return new Date(val);

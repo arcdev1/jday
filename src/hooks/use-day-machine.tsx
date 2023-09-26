@@ -1,8 +1,6 @@
 import { useContext } from "react";
 import {
   DayMachineState,
-  enterMorning,
-  enterSchoolDay,
   setBad,
   setGood,
   setNotes,
@@ -21,12 +19,4 @@ export const useDayMachine = (): DayMachineContextValue => {
   return context;
 };
 
-export {
-  DayMachineState,
-  enterMorning,
-  enterSchoolDay,
-  setBad,
-  setGood,
-  setNotes,
-  submit,
-};
+export { DayMachineState, setBad, setGood, setNotes, submit };

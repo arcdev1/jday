@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "~/db";
-import { makeSession } from "~/models/session";
 import { getCurrentSession } from "~/server/session-utils";
-
-const COOKIE_KEY = "session";
+import { randomUUID } from "crypto";
+import { SESSION_KEY, makeSession } from "~/models/session";
 
 export async function POST(req: NextRequest) {
   const { email, password } = (await req.json()) as {
@@ -14,7 +13,6 @@ export async function POST(req: NextRequest) {
   const user = await db?.user.findUnique({
     where: { email: email.toLowerCase() },
   });
-  console.log("user", user);
 
   if (!user) {
     return new NextResponse("No such user.", { status: 404 });
@@ -24,15 +22,20 @@ export async function POST(req: NextRequest) {
   if (!match) {
     return new NextResponse("Unauthorized.", { status: 401 });
   }
+
   const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
-  const serializedUser = JSON.stringify({
+  const session = makeSession({
     ...user,
+    id: randomUUID(),
+    userId: user.id,
     expiry,
     password: undefined,
   });
+  const serializedSession = JSON.stringify(session);
 
-  let response = new NextResponse(serializedUser, { status: 201 });
-  response.cookies.set(COOKIE_KEY, serializedUser, {
+  let response = new NextResponse(serializedSession, { status: 201 });
+
+  response.cookies.set(SESSION_KEY, serializedSession, {
     httpOnly: true,
     path: "/",
     sameSite: "lax",

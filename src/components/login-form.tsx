@@ -16,7 +16,6 @@ const LoginForm = () => {
         headers: { "Content-Type": "application/json" },
       });
       if (res.ok) {
-        console.log(await res.json());
         router.push("/secure/today");
       } else {
         console.error(await res.text());
