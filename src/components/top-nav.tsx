@@ -20,7 +20,7 @@ export default function TopNav() {
         </li>
         <li>
           <Link
-            href="/profile"
+            href="/secure/profile"
             className="text-white rounded-full px-2 py-1 bg-blue-700"
           >
             {session.name[0]}
