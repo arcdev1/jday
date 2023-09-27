@@ -24,17 +24,13 @@ model User {
 }
 
 model DailyReport {
-  id            String   @id @default(uuid()) @db.Uuid
-  userId        String   @db.Uuid
-  user          User     @relation(fields: [userId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  morningNotes  String?  @default("") @db.Text
-  dayNotes      String?  @default("") @db.Text
-  morningRating Rating?
-  dayRating     Rating?
-  rating        Rating
-  notes         String   @default("") @db.Text
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rating    Rating
+  notes     String   @default("") @db.Text
 }
 
 enum Rating {
