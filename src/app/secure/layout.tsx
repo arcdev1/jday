@@ -9,7 +9,7 @@ export default function SecureLayout({ children }: PropsWithChildren<{}>) {
       <Header>
         <TopNav />
       </Header>
-      <main className="w-4/6 mx-auto">{children}</main>
+      <main className="w-4/6 mx-auto text-black">{children}</main>
     </SessionProvider>
   );
 }
