@@ -6,17 +6,21 @@ export function middleware(request: NextRequest) {
   const currentUrl = new URL(request.url);
   const session = getCurrentSession(request);
 
-  // Check if the session is null or expired
-  const isSessionInvalid = session == null || isSessionExpired(session);
+  const isSessionValid = session != null && !isSessionExpired(session);
+  const isSessionInvalid = !isSessionValid;
 
   // Redirect to the root if the session is invalid and the current path is not the root
   if (isSessionInvalid && currentUrl.pathname !== "/") {
-    return NextResponse.redirect(new URL("/", request.url).href);
+    const loginUrl = new URL("/", request.url);
+    loginUrl.searchParams.set("next", currentUrl.pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect to /secure/today if the session is valid and the current path is the root
-  if (!isSessionInvalid && currentUrl.pathname == "/") {
-    return NextResponse.redirect(new URL("/secure/today", request.url));
+  // Redirect if the session is valid and the current path is the root
+  if (isSessionValid && currentUrl.pathname == "/") {
+    const next = request.nextUrl.searchParams.get("next") ?? "/secure/today";
+    console.log("next", next);
+    return NextResponse.redirect(new URL(next, request.url));
   }
 
   // Continue to the next middleware or route handler
