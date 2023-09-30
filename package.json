@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "prisma migrate deploy && prisma generate && prisma db seed && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "xstate:typegen": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "dependencies": {
     "@prisma/client": "5.3.1",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.4",
     "@types/luxon": "^3.3.2",
+    "@xstate/cli": "^0.5.2",
     "prisma": "5.3.1",
     "ts-node": "^10.9.1"
   },

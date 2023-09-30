@@ -4,6 +4,7 @@ import { Rating } from "~/models/rating";
 export type DayMachineContext = {
   rating: Rating;
   notes: string | null;
+  error: string | null;
 };
 
 export type DayMachineEvent =
@@ -20,6 +21,8 @@ export enum DayMachineState {
   GOOD = "good",
   BAD = "bad",
   SUBMITTING = "submitting",
+  SUBMITTED = "submitted",
+  FAILED = "failed",
 }
 
 export function setGood(): DayMachineEvent {
@@ -42,71 +45,107 @@ export function submit(): DayMachineEvent {
   return { type: "SUBMIT" };
 }
 
-const dayMachine = createMachine<DayMachineContext, DayMachineEvent>({
-  predictableActionArguments: true,
-  id: "dayMachine",
-  initial: "unknown",
-  context: {
-    notes: null,
-    rating: Rating.UNKNOWN,
+const dayMachine = createMachine(
+  {
+    tsTypes: {} as import("./day-machine.typegen").Typegen0,
+    predictableActionArguments: true,
+    id: "dayMachine",
+    initial: "unknown",
+    schema: {
+      events: {} as DayMachineEvent,
+      services: {} as {
+        submit: {
+          data: Response;
+        };
+      },
+      context: {} as DayMachineContext,
+    },
+    context: {
+      notes: null,
+      rating: Rating.UNKNOWN,
+      error: null,
+    },
+    on: {
+      SET_NOTES: {
+        actions: "setNotes",
+      },
+      SUBMIT: "submitting",
+    },
+    states: {
+      unknown: {
+        on: {
+          SET_GOOD: {
+            target: "good",
+            actions: assign<DayMachineContext>({
+              rating: Rating.GOOD,
+            }),
+          },
+          SET_BAD: {
+            target: "bad",
+            actions: assign<DayMachineContext>({ rating: Rating.BAD }),
+          },
+        },
+      },
+      good: {
+        on: {
+          SET_GOOD: {
+            target: "unknown",
+            actions: "setUnknownRating",
+          },
+          SET_BAD: {
+            target: "bad",
+            actions: "setBadRating",
+          },
+        },
+      },
+      bad: {
+        on: {
+          SET_GOOD: {
+            target: "good",
+            actions: "setGoodRating",
+          },
+          SET_BAD: {
+            target: "unknown",
+            actions: "setUnknownRating",
+          },
+        },
+      },
+      submitting: {
+        on: {
+          CANCEL: "unknown",
+        },
+        invoke: {
+          src: "submit",
+          onDone: {
+            target: "submitted",
+          },
+          onError: {
+            target: "failed",
+          },
+        },
+      },
+      submitted: {},
+      failed: {},
+    },
   },
-  on: {
-    SET_NOTES: {
-      actions: assign({ notes: (_, event) => event.notes }),
+  {
+    actions: {
+      setNotes: (_, event) => ({ notes: event.notes }),
+      setGoodRating: () => ({ rating: Rating.GOOD }),
+      setBadRating: () => ({ rating: Rating.BAD }),
+      setUnknownRating: () => ({ rating: Rating.UNKNOWN }),
     },
-    SUBMIT: "submitting",
-  },
-  states: {
-    unknown: {
-      on: {
-        SET_GOOD: {
-          target: "good",
-          actions: assign<DayMachineContext>({
-            rating: Rating.GOOD,
+    services: {
+      submit: async (context) =>
+        fetch("/api/daily-report", {
+          method: "POST",
+          body: JSON.stringify({
+            rating: context.rating,
+            notes: context.notes,
           }),
-        },
-        SET_BAD: {
-          target: "bad",
-          actions: assign<DayMachineContext>({ rating: Rating.BAD }),
-        },
-      },
+        }),
     },
-    good: {
-      on: {
-        SET_GOOD: {
-          target: "unknown",
-          actions: assign<DayMachineContext>({
-            rating: Rating.UNKNOWN,
-          }),
-        },
-        SET_BAD: {
-          target: "bad",
-          actions: assign<DayMachineContext>({ rating: Rating.BAD }),
-        },
-      },
-    },
-    bad: {
-      on: {
-        SET_GOOD: {
-          target: "good",
-          actions: assign<DayMachineContext>({
-            rating: Rating.GOOD,
-          }),
-        },
-        SET_BAD: {
-          target: "unknown",
-          actions: assign<DayMachineContext>({
-            rating: Rating.UNKNOWN,
-          }),
-        },
-      },
-    },
-    submitting: {
-      on: {
-        CANCEL: "unknown",
-      },
-    },
-  },
-});
+  }
+);
 
 export default dayMachine;

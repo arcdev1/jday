@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession } from "~/hooks/use-session";
 
 export default function TopNav() {
-  const session = useSession();
+  const { session } = useSession();
   return session != null ? (
     <nav>
       <ul className="flex space-x-4">

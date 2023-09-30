@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "~/db";
 import { makeDailyReport } from "~/models/daily-report";
 import { getCurrentSession, isSessionExpired } from "~/server/session-utils";
+import { DailyReport } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,14 +59,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function GET(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const reqUrl = new URL(req.nextUrl);
     const session = authorize(req);
     const scope = reqUrl.searchParams.get("scope")?.toLowerCase() ?? "today";
+    let reports = [] as DailyReport[] | undefined;
     if (scope === "today") {
-      const { nowUTC, startOfDayUTC, endOfDayUTC } = getESTDayBoundaryInUTC();
-      const reports = await db?.dailyReport.findMany({
+      const { startOfDayUTC, endOfDayUTC } = getESTDayBoundaryInUTC();
+      reports = await db?.dailyReport.findMany({
         where: {
           createdAt: {
             gte: startOfDayUTC.toJSDate(),
@@ -74,6 +76,8 @@ async function GET(req: NextRequest) {
         },
       });
     }
+    reports = await db?.dailyReport.findMany();
+    return new NextResponse(JSON.stringify(reports ?? []), { status: 200 });
   } catch (error) {
     console.error(error);
     if (error instanceof NotAuthorizedError) {

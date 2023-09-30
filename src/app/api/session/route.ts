@@ -1,49 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import db from "~/db";
-import { getCurrentSession } from "~/server/session-utils";
-import { randomUUID } from "crypto";
-import { SESSION_KEY, makeSession } from "~/models/session";
+import { getCurrentSession } from "~/use-cases/server/get-current-session";
+import { SESSION_KEY } from "~/models/session";
+import { initiateSession } from "~/use-cases/server/initiate-session";
+import { makeCredential } from "~/models/credential";
+import { endSession } from "~/use-cases/server/end-session";
 
 export async function POST(req: NextRequest) {
-  const { email, password } = (await req.json()) as {
-    email: string;
-    password: string;
-  };
-  const user = await db?.user.findUnique({
-    where: { email: email.toLowerCase() },
-  });
+  let credential;
 
-  if (!user) {
-    return new NextResponse("No such user.", { status: 404 });
+  try {
+    credential = makeCredential(await req.json());
+  } catch (error) {
+    console.error(error);
+    return new NextResponse(
+      JSON.stringify({
+        message: (error as Error).message,
+        error,
+      }),
+      { status: 400 }
+    );
   }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
+  try {
+    const session = await initiateSession(credential);
+
+    const serializedSession = JSON.stringify(session);
+    let response = new NextResponse(serializedSession, { status: 201 });
+
+    response.cookies.set(SESSION_KEY, serializedSession, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      expires: session.expiry,
+    });
+
+    return response;
+  } catch (error) {
+    console.error(error);
     return new NextResponse("Unauthorized.", { status: 401 });
   }
-
-  const expiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365);
-  const session = makeSession({
-    ...user,
-    id: randomUUID(),
-    userId: user.id,
-    expiry,
-    password: undefined,
-  });
-  const serializedSession = JSON.stringify(session);
-
-  let response = new NextResponse(serializedSession, { status: 201 });
-
-  response.cookies.set(SESSION_KEY, serializedSession, {
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    expires: expiry,
-  });
-
-  return response;
 }
 
 export async function GET(req: NextRequest) {
@@ -56,5 +52,21 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error(error);
     return new NextResponse("Unauthorized.", { status: 401 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    endSession(req);
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error(error);
+    return new NextResponse(
+      JSON.stringify({
+        message: (error as Error).message,
+        error,
+      }),
+      { status: 400 }
+    );
   }
 }

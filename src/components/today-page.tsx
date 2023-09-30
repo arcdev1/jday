@@ -1,18 +1,15 @@
 "use client";
 
-import {
-  setBad,
-  setGood,
-  setNotes,
-  submit,
-  useDayMachine,
-  DayMachineState,
-} from "~/hooks/use-day-machine";
+import { useDayMachine } from "~/hooks/use-day-machine";
 import { Rating } from "~/models/rating";
+import { Role } from "~/models/role";
 import RatingIcon from "./rating-icon";
+import { useSession } from "~/hooks/use-session";
 
 export default function TodayPage() {
-  const { state, send } = useDayMachine();
+  const { state, send, setBad, setGood, setNotes, DayMachineState, submit } =
+    useDayMachine();
+  const session = useSession();
 
   const onRatingClick = (rating: Rating) => {
     if (rating === Rating.GOOD) {
@@ -24,6 +21,13 @@ export default function TodayPage() {
 
   const currentRating = state.context.rating;
   const currentNotes = state.context.notes;
+  const question =
+    session?.role === Role.GUARDIAN
+      ? "How was Jacob's morning?"
+      : "How was Jacob's day?";
+  if (state.matches(DayMachineState.SUBMITTED)) {
+    return <>Thanks!</>;
+  }
 
   return (
     <form
@@ -33,9 +37,7 @@ export default function TodayPage() {
       }}
     >
       <div className="flex flex-col items-center justify-center pt-12">
-        <h2 className="text-4xl mb-8 text-black drop-shadow-md">
-          How is Jacob doing?
-        </h2>
+        <h2 className="text-4xl mb-8 text-black drop-shadow-md">{question}</h2>
         <div className="flex space-x-8 mb-4">
           <button
             type="button"

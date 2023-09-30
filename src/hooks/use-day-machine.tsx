@@ -1,22 +1,30 @@
-import { useContext } from "react";
-import {
+import { useMachine } from "@xstate/react";
+import dayMachine, {
+  type DayMachineContext,
   DayMachineState,
+  type DayMachineEvent,
   setBad,
   setGood,
   setNotes,
   submit,
 } from "~/machines/day-machine";
-import {
-  DayMachineContextValue,
-  DayMachineContext,
-} from "~/providers/day-machine-provider";
 
-export const useDayMachine = (): DayMachineContextValue => {
-  const context = useContext(DayMachineContext);
-  if (!context) {
-    throw new Error("useDayMachine must be used within a DayMachineProvider");
-  }
-  return context;
+export const useDayMachine = (initialContext?: DayMachineContext) => {
+  const machineConfig = initialContext
+    ? dayMachine.withContext({ ...dayMachine.context, ...initialContext })
+    : dayMachine;
+
+  const [state, send, service] = useMachine(machineConfig);
+  return {
+    state,
+    send,
+    service,
+    setBad,
+    setGood,
+    setNotes,
+    submit,
+    DayMachineState,
+  };
 };
 
-export { DayMachineState, setBad, setGood, setNotes, submit };
+export type { DayMachineEvent, DayMachineContext };
