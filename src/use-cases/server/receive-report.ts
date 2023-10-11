@@ -8,6 +8,9 @@ import { randomUUID } from "node:crypto";
 import { Session } from "~/models/session";
 import db from "~/db";
 
+// This function receives a report submission.
+// - reportSubmission: The submitted report.
+// - reportSubmissionKey: The key for the submitted report.
 export async function receiveReport(submission: DailyReportSubmission) {
   let session = getCurrentSession(true);
   session = handleAnonymousSubmission(session);
@@ -41,6 +44,11 @@ export async function receiveReport(submission: DailyReportSubmission) {
       },
     },
   });
+
+  if (!dbResult) {
+    throw new Error("Report creation failed");
+  }
+
   return makeDailyReport(dbResult);
 }
 
