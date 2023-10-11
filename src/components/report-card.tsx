@@ -25,7 +25,9 @@ export default function ReportCard({ report }: { report: DailyReport }) {
         <RatingIcon rating={report.rating} />
       </div>
       <div
-        className={`${isExpanded ? "h-auto" : "h-12 truncate"} max-w-lg w-full`}
+        className={`${
+          isExpanded ? "h-auto" : "h-12 truncate"
+        } max-w-11/12 w-full`}
       >
         At {time}{" "}
         <a
