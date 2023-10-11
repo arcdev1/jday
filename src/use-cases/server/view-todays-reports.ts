@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getUTCDayBoundary } from "~/utils/date-time-utils";
+import { getUTCDayBoundary } from "~/use-cases/helpers/date-time-utils";
 import db from "~/db";
 
 export async function viewTodaysReports(today: Date = new Date()) {

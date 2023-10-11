@@ -10,7 +10,7 @@ import {
   receiveReport,
   AnonymousSubmissionError,
 } from "~/use-cases/server/receive-report";
-import { ExpiredSessionError } from "~/use-cases/server/get-current-session";
+import { ExpiredSessionError } from "~/use-cases/helpers/session-utils";
 
 export async function POST(req: NextRequest) {
   try {

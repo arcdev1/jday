@@ -2,8 +2,8 @@ import "server-only";
 
 import { DailyReportSubmission, makeDailyReport } from "~/models/daily-report";
 import { validateReportSubmission } from "~/use-cases/helpers/validate-report-submission";
-import { getUTCDayBoundary } from "~/utils/date-time-utils";
-import { getCurrentSession } from "~/use-cases/server/get-current-session";
+import { getUTCDayBoundary } from "~/use-cases/helpers/date-time-utils";
+import { getCurrentSession } from "~/use-cases/helpers/session-utils";
 import { randomUUID } from "node:crypto";
 import { Session } from "~/models/session";
 import db from "~/db";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentSession } from "~/use-cases/server/get-current-session";
+import { getCurrentSession } from "~/use-cases/helpers/session-utils";
 
 export default function TopNav() {
   const session = getCurrentSession();

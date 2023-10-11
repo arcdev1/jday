@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentSession } from "~/use-cases/server/get-current-session";
+import { getCurrentSession } from "~/use-cases/helpers/session-utils";
 import { SESSION_KEY } from "~/models/session";
 import { initiateSession } from "~/use-cases/server/initiate-session";
 import { makeCredential } from "~/models/credential";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { roleSchema } from "~/models/role"; // Replace with the actual path to your roleSchema
+import { roleSchema } from "~/models/role";
 import { createdAtSchema } from "./created-at";
 import { updatedAtSchema } from "./updated-at";
 
@@ -8,7 +8,7 @@ export const userSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   password: z.string(),
-  role: roleSchema, // Using the imported roleSchema
+  role: roleSchema,
   createdAt: createdAtSchema,
   updatedAt: updatedAtSchema,
   version: z.number().default(1),

@@ -1,7 +1,7 @@
 import React from "react";
 import TodayPage from "~/components/today-page";
 import { DailyReport } from "~/models/daily-report";
-import { getCurrentSession } from "~/use-cases/server/get-current-session";
+import { getCurrentSession } from "~/use-cases/helpers/session-utils";
 import { viewTodaysReports } from "~/use-cases/server/view-todays-reports";
 
 export const dynamic = "force-dynamic";
