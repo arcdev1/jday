@@ -7,7 +7,7 @@ import {
 
 export function middleware(request: NextRequest) {
   const currentUrl = new URL(request.url);
-  const session = getCurrentSession(request);
+  const session = getCurrentSession();
 
   const isSessionValid = session != null && !isSessionExpired(session);
   const isSessionInvalid = !isSessionValid;

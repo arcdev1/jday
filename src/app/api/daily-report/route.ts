@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 }
 
 function authorize(req: NextRequest) {
-  const session = getCurrentSession(req);
+  const session = getCurrentSession(false);
   if (session == null || isSessionExpired(session)) {
     throw new NotAuthorizedError();
   }
