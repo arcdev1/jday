@@ -222,7 +222,11 @@ export const dailyReportMachine = createMachine(
       isRatingBad: (context) => context.rating === Rating.BAD,
     },
     services: {
-      submit: submitDailyReport,
+      submit: (context) =>
+        submitDailyReport({
+          rating: context.rating,
+          notes: context.notes,
+        }),
     },
   }
 );

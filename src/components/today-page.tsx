@@ -39,7 +39,7 @@ export default function TodayPage({
     <div className="flex flex-col items-center justify-center pt-12">
       {hasSubmitted() ? (
         <>
-          <h1 className="text-3xl mt-4">{thanks}</h1>
+          <h1 className="text-2xl md:text-3xl mt-4">{thanks}</h1>
           <button
             onClick={reset}
             className="bg-blue-500 py-2 px-4 rounded text-white mt-4"
@@ -55,7 +55,7 @@ export default function TodayPage({
           }}
         >
           {error && <div className="text-red-500 mb-4">{error.message}</div>}
-          <h1 className="text-3xl mb-8 text-black drop-shadow-md text-center">
+          <h1 className="text-2xl md:text-3xl mb-8 text-black drop-shadow-md text-center">
             {question}
           </h1>
           <div className="flex space-x-8 mb-4 w-full justify-center">
@@ -63,7 +63,7 @@ export default function TodayPage({
               id="good"
               name="good"
               type="button"
-              className={`text-9xl p-4 rounded-full ${
+              className={`text-5xl sm:text-7xl md:text-9xl p-4 rounded-full ${
                 rating == Rating.GOOD
                   ? "bg-green-200 border border-green-500"
                   : "border border-transparent"
@@ -74,7 +74,7 @@ export default function TodayPage({
             </button>
             <button
               type="button"
-              className={`text-9xl p-4 rounded-full ${
+              className={`text-5xl sm:text-7xl md:text-9xl p-4 rounded-full ${
                 rating == Rating.BAD
                   ? "bg-red-200 border border-red-500"
                   : "border border-transparent"

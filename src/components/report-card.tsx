@@ -16,7 +16,7 @@ export default function ReportCard({ report }: { report: DailyReport }) {
   const okOrDistresses = report.rating == "GOOD" ? "okay" : "distressed";
   return (
     <div
-      className={`border rounded-lg items-center justify-center py-2 px-4 flex border-gray-800 shadow shadow-black bg-slate-100 mb-4 gap-4 cursor-pointer`}
+      className={`border rounded-lg items-center justify-center py-2 px-4 flex border-gray-800 shadow shadow-black bg-slate-100 mb-4 gap-4 cursor-pointer max-w-11/12`}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div

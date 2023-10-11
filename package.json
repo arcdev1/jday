@@ -10,13 +10,16 @@
     "xstate:typegen": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "dependencies": {
-    "@prisma/client": "5.3.1",
+    "@neondatabase/serverless": "^0.6.0",
+    "@prisma/adapter-neon": "^5.4.2",
+    "@prisma/client": "5.4.2",
     "@types/node": "20.6.3",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
     "@xstate/react": "^3.2.2",
     "autoprefixer": "10.4.16",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.2",
     "luxon": "^3.4.3",
@@ -29,14 +32,16 @@
     "server-only": "^0.0.1",
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2",
+    "ws": "^8.14.2",
     "xstate": "^4.38.2",
     "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.4",
     "@types/luxon": "^3.3.2",
+    "@types/ws": "^8.5.7",
     "@xstate/cli": "^0.5.2",
-    "prisma": "5.3.1",
+    "prisma": "5.4.2",
     "ts-node": "^10.9.1"
   },
   "prisma": {
