@@ -1,10 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { useSession } from "~/hooks/use-session";
+import { getCurrentSession } from "~/use-cases/server/get-current-session";
 
 export default function TopNav() {
-  const { session } = useSession();
+  const session = getCurrentSession();
   return session != null ? (
     <nav>
       <ul className="flex space-x-4">

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { NextRequest } from "next/server";
 import { type Session, makeSession, SESSION_KEY } from "~/models/session";
 

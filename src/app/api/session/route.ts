@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const session = getCurrentSession(req, true);
+    const session = getCurrentSession(true);
     if (session == null) {
       return new NextResponse("Not found.", { status: 404 });
     }

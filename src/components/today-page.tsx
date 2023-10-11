@@ -1,95 +1,125 @@
 "use client";
 
-import { useDayMachine } from "~/hooks/use-day-machine";
 import { Rating } from "~/models/rating";
-import { Role } from "~/models/role";
 import RatingIcon from "./rating-icon";
-import { useSession } from "~/hooks/use-session";
+import { useDailyReport } from "~/hooks/use-daily-report";
+import TextareaAutosize from "react-textarea-autosize";
+import ReportCard from "./report-card";
+import { Session } from "~/models/session";
+import { DailyReport } from "~/models/daily-report";
+import { BeatLoader } from "react-spinners";
+import { areNotesRequired } from "~/use-cases/helpers/are-notes-required";
 
-export default function TodayPage() {
-  const { state, send, setBad, setGood, setNotes, DayMachineState, submit } =
-    useDayMachine();
-  const session = useSession();
-
-  const onRatingClick = (rating: Rating) => {
-    if (rating === Rating.GOOD) {
-      send(setGood());
-    } else {
-      send(setBad());
-    }
-  };
-
-  const currentRating = state.context.rating;
-  const currentNotes = state.context.notes;
-  const question =
-    session?.role === Role.GUARDIAN
-      ? "How was Jacob's morning?"
-      : "How was Jacob's day?";
-  if (state.matches(DayMachineState.SUBMITTED)) {
-    return <>Thanks!</>;
-  }
+export default function TodayPage({
+  session,
+  initialReports,
+}: {
+  session: Session;
+  initialReports?: DailyReport[];
+}) {
+  const {
+    canEditNotes,
+    disableSubmit,
+    error,
+    hasSubmitted,
+    isSubmitting,
+    notes,
+    question,
+    rateBad,
+    rateGood,
+    rating,
+    reports,
+    reset,
+    setNotes,
+    submit,
+    thanks,
+  } = useDailyReport({ initialReports, session });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        send(submit());
-      }}
-    >
-      <div className="flex flex-col items-center justify-center pt-12">
-        <h2 className="text-4xl mb-8 text-black drop-shadow-md">{question}</h2>
-        <div className="flex space-x-8 mb-4">
+    <div className="flex flex-col items-center justify-center pt-12">
+      {hasSubmitted() ? (
+        <>
+          <h1 className="text-3xl mt-4">{thanks}</h1>
           <button
-            type="button"
-            className={`text-9xl p-4 rounded-full ${
-              currentRating == Rating.GOOD
-                ? "bg-green-200 border border-green-500"
-                : "border border-transparent"
-            }`}
-            onClick={() => onRatingClick(Rating.GOOD)}
+            onClick={reset}
+            className="bg-blue-500 py-2 px-4 rounded text-white mt-4"
           >
-            <RatingIcon rating={Rating.GOOD} />
+            Report something else
           </button>
-          <button
-            type="button"
-            className={`text-9xl p-4 rounded-full ${
-              currentRating == Rating.BAD
-                ? "bg-red-200 border border-red-500"
-                : "border border-transparent"
-            }`}
-            onClick={() => onRatingClick(Rating.BAD)}
-          >
-            <RatingIcon rating={Rating.BAD} />
-          </button>
-        </div>
-        {(currentRating != Rating.UNKNOWN || currentNotes) && (
-          <>
-            <label
-              className="text-xl mb-4 text-black drop-shadow-md"
-              htmlFor="notes"
-            >
-              Notes
-            </label>
-            <textarea
-              id="notes"
-              className="w-full h-32 p-2 rounded text-black"
-              placeholder="Tell me more..."
-              value={currentNotes ?? ""}
-              onChange={(e) => send(setNotes(e.target.value))}
-            ></textarea>
+        </>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
+          {error && <div className="text-red-500 mb-4">{error.message}</div>}
+          <h1 className="text-3xl mb-8 text-black drop-shadow-md text-center">
+            {question}
+          </h1>
+          <div className="flex space-x-8 mb-4 w-full justify-center">
             <button
-              type="submit"
-              className="mt-4 p-2 bg-blue-500 disabled:bg-gray-300 text-white rounded"
-              disabled={
-                state.matches(DayMachineState.SUBMITTING) ||
-                currentRating == Rating.UNKNOWN
-              }
+              id="good"
+              name="good"
+              type="button"
+              className={`text-9xl p-4 rounded-full ${
+                rating == Rating.GOOD
+                  ? "bg-green-200 border border-green-500"
+                  : "border border-transparent"
+              }`}
+              onClick={rateGood}
             >
-              Submit
+              <RatingIcon rating={Rating.GOOD} />
             </button>
-          </>
-        )}
+            <button
+              type="button"
+              className={`text-9xl p-4 rounded-full ${
+                rating == Rating.BAD
+                  ? "bg-red-200 border border-red-500"
+                  : "border border-transparent"
+              }`}
+              onClick={rateBad}
+            >
+              <RatingIcon rating={Rating.BAD} />
+            </button>
+          </div>
+
+          {canEditNotes() && (
+            <>
+              <label
+                className="text-xl mb-4 text-black drop-shadow-md"
+                htmlFor="notes"
+              >
+                Notes:
+              </label>
+
+              <TextareaAutosize
+                id="notes"
+                minRows={3}
+                className="w-full h-32 p-2 rounded text-black resize-y"
+                placeholder="Tell me more..."
+                value={notes ?? ""}
+                required={areNotesRequired({ rating })}
+                onChange={(e) => setNotes(e.target.value)}
+              ></TextareaAutosize>
+              <button
+                type="submit"
+                className="mt-4 p-2 bg-blue-500 disabled:bg-gray-300 text-white rounded w-full"
+                disabled={disableSubmit()}
+              >
+                {isSubmitting() ? <BeatLoader /> : "Submit"}
+              </button>
+            </>
+          )}
+        </form>
+      )}
+      <div>
+        <hr className="border border-1 border-blue-200 m-4"></hr>
+        {reports?.map((report) => (
+          <ReportCard key={report.id} report={report} />
+        ))}
       </div>
-    </form>
+    </div>
   );
 }

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCurrentSession, isSessionExpired } from "./server/session-utils";
+import {
+  getCurrentSession,
+  isSessionExpired,
+} from "./use-cases/helpers/session-utils";
 
 export function middleware(request: NextRequest) {
   const currentUrl = new URL(request.url);

@@ -1,12 +1,11 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "~/hooks/use-session";
+import { login } from "~/use-cases/client/login";
 
 const LoginForm = ({ afterLogin }: { afterLogin?: string }) => {
   const router = useRouter();
-  const { isLoggedIn, logIn, logInError } = useSession();
-  const [errorMessage, setErrorMessage] = useState(logInError?.message);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -15,27 +14,19 @@ const LoginForm = ({ afterLogin }: { afterLogin?: string }) => {
         const data = new FormData(e.target as HTMLFormElement);
         const email = data.get("email") as string;
         const password = data.get("password") as string;
-        logIn({ email, password });
+        await login({ email, password });
+        if (afterLogin) {
+          router.push(afterLogin);
+        } else {
+          router.push("/secure/today");
+        }
       } catch (error) {
         console.error(error);
         setErrorMessage("Login failed"); // Set error message
       }
     },
-    [logIn]
+    [router, afterLogin]
   );
-
-  useEffect(() => {
-    if (isLoggedIn()) {
-      if (afterLogin != null) {
-        router.push(afterLogin);
-        return;
-      }
-      router.push("/secure/today");
-    }
-    if (logInError != null) {
-      setErrorMessage(`Error: ${logInError.message}`); // Set error message
-    }
-  }, [isLoggedIn, logInError, router, afterLogin]);
 
   return (
     <div className="flex justify-center items-center h-96 -mb-16">
